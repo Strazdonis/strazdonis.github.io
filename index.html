@@ -1,1 +1,42 @@
-"Hello world!" 
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Pabendraujam &lt;3</title>
+    <script src="dist/web/chatkit.js"></script>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+  <div id="login"  style="display:none">
+	<h2>Kas tu toks, dėdė?</h2>
+	<form action="#" id="logas">
+		<input id="vardas_input" type="text" name="vardas" placeholder="Vardelis">
+		<div class="skyriklis">
+			<input type="submit" name="submit" value="Važiuojam">
+		</div>
+	</form>
+  </div>
+  <div id="logged_in" style="display:none">
+    <div style="text-align:right;"><button type="button" onclick="logout()" class="logout">Atsijungti</button></div>
+    <ul id="messages"></ul>
+	<div style="display:none" id="rasytojas_atsirado"><b></b><span> kažką rašo</span></div>
+    <div id="compose-wrapper">
+	<form id="form" action="#">
+      <input name="messageText" type="text" id="text-input">
+      <div class="choose-file">
+        +
+        <input name="testfile" type="file">
+      </div>
+      <button type="submit" id="send-button">SEND</button>
+	</form>
+    </div>
+  </div>
+  <script>
+  	function logout() {
+		window.localStorage.removeItem('vardas');
+		location.reload();
+	}
+  </script>
+    <script src="main.js"></script>
+  </body>
+</html>
