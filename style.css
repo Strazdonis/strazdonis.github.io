@@ -4,10 +4,53 @@ body {
 }
 .logout {
 	background-color:#f0f0f0;
-	padding:10px;
-	margin:3px;
-	border:none;
-	cursor:pointer;
+	width:100%;
+	padding:5px;
+	border-bottom: solid #e0e0e0;
+	cursor: pointer;
+	border-width: 0 0 1px 0;
+}
+.user {
+	text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 5px;
+}
+.online {
+	position:relative;
+	padding:5px 10px;
+}
+.online::after {
+	content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 100%;
+    background: #4CAF51;
+    position: absolute;
+    left: 0px;
+    bottom: calc(50% - 7px/2);
+}
+.offline {
+	position:relative;
+	padding:5px 10px;
+}
+.offline::after {
+	content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 100%;
+    background: #F44336;
+    position: absolute;
+    left: 0px;
+    bottom: calc(50% - 7px/2);
+}
+#side_right {
+	height: 100%;
+	width: 15%;
+	background-color: #f8f8f8;
+	position: fixed;
+	top: 0;
+	right: 0;
+	border-left: #f0f0f0 1px solid;
 }
 #rasytojas_atsirado {
 	background-color:#f0f0f0;

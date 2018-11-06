@@ -17,6 +17,7 @@ if(window.localStorage.getItem("vardas")) {
 	let rasytojai = []
 	let currentUser
 	let room
+	let online_old = []
 	const tokenProvider = new Chatkit.TokenProvider({
 	  url: TOKEN_PROVIDER_URL
 	})
@@ -28,19 +29,36 @@ if(window.localStorage.getItem("vardas")) {
 	})
 	chatManager.connect()
 	  .then(cUser => {
+		  
+		document.getElementById("neegzistuoja").style.display="none";
 		currentUser = cUser
+		online_old.push(cUser.name);
+		currentUser.users.filter(user => user.presence.state === 'online' && user.name !== currentUser.name).forEach(function(user) {
+			div = document.createElement("div");
+			div.classList.add("user");
+			div.innerHTML+='<span name="'+user.name+'" class="online">'+user.name+'</span>';
+			document.getElementById("side_right").appendChild(div);
+		});
+		currentUser.users.filter(user => user.presence.state != 'online' && user.name !== currentUser.name).forEach(function(user) {
+			div = document.createElement("div");
+			div.classList.add("user");
+			div.innerHTML+='<span name="'+user.name+'" class="offline">'+user.name+'</span>';
+			document.getElementById("side_right").appendChild(div);
+		});
 		const roomToSubscribeTo = currentUser.rooms[0]
 
 		if (roomToSubscribeTo) {
 		  room = roomToSubscribeTo
-		  console.log('Going to subscribe to', roomToSubscribeTo)
+		  
 		  currentUser.subscribeToRoom({
 			roomId: roomToSubscribeTo.id,
 			hooks: {
+				onPresenceChanged: (state, user) => {
+					console.log("lmao");
+				},
 			  onUserStartedTyping: user => {
 				rasytojai.push(user);
 				rasytojai.forEach(function(raso) {
-				  console.log(raso.name + "kazka raso");
 				  listas.innerText+=raso.name;
 				});
 				document.getElementById("rasytojas_atsirado").style.display = "block";
@@ -56,7 +74,6 @@ if(window.localStorage.getItem("vardas")) {
 				});
 			  },
 			  onNewMessage: message => {
-				console.log('new message:', message)
 				const messagesList = document.getElementById('messages')
 				const messageItem = document.createElement('li')
 				messageItem.className = 'message'
@@ -111,11 +128,30 @@ if(window.localStorage.getItem("vardas")) {
 	  .catch(err => {
 		console.log('Error on connection: ', err)
 	  })
+	  
+	  setInterval(function() {
+		offline = currentUser.users.filter(user => user.presence.state != 'online' && user.name !== currentUser.name);
+		online = currentUser.users.filter(user => user.presence.state === 'online' && user.name !== currentUser.name);
+		online.forEach(function(usr) {
+			if(!online_old.includes(usr.name)) {
+				document.getElementsByName(usr.name)[0].classList.add("online");
+				document.getElementsByName(usr.name)[0].classList.remove("offline");
+				online_old.push(usr.name);
+			}
+		});
+		offline.forEach(function(usr) {
+			if(online_old.includes(usr.name)) {
+				document.getElementsByName(usr.name)[0].classList.remove("online");
+				document.getElementsByName(usr.name)[0].classList.add("offline");
+				removeA(online_old,usr.name);
+			}
+		});
+	  },1000);
 	document.addEventListener("DOMContentLoaded", function() {
 		document.getElementById("text-input").addEventListener('keypress', ev=> {
-			currentUser.isTypingIn({ roomId: 19372887 })
+			currentUser.isTypingIn({ roomId: 19372995 })
 				.then(() => {
-					console.log('Success!')
+					
 				})
 				.catch(err => {
 				console.log(`Error sending typing indicator: ${err}`)
@@ -141,7 +177,6 @@ if(window.localStorage.getItem("vardas")) {
 		  : undefined,
 	  })
 		.then(messageId => {
-		  console.log('Success!', messageId)
 		  fileInput.value = ''
 		  textInput.value = ''
 		})
