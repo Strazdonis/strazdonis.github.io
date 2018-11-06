@@ -1,2 +1,1 @@
-# strazdonis.github.io
-everything
+
