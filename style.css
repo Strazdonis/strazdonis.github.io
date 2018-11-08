@@ -4,11 +4,19 @@ body {
 }
 .logout {
 	background-color:#f0f0f0;
-	width:100%;
-	padding:5px;
-	border-bottom: solid #e0e0e0;
+	height:100%;
+	width:15vw;
+	border-left: solid #e0e0e0;
 	cursor: pointer;
-	border-width: 0 0 1px 0;
+	border-width: 0 0 0 1px;
+}
+.create {
+	background-color:#f0f0f0;
+	height:100%;
+	border-right: solid #e0e0e0;
+	cursor: pointer;
+	width:15vw;
+	border-width: 0 1px 0 0;
 }
 .user {
 	text-align: center;
@@ -18,6 +26,31 @@ body {
 .online {
 	position:relative;
 	padding:5px 10px;
+}
+.room.active {
+	background-color:#e0e0e0;
+	font-weight:400;
+	cursor:default;
+}
+.room {
+	text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 5px;
+	font-weight: 300;
+	cursor:pointer;
+}
+#top_bar {
+	position: fixed;
+	top: 0px;
+	width: 100%;
+	z-index: 1;
+	background-color: #f8f8f8;
+	border-bottom: 1px solid #e0e0e0;
+	height: 30px;
+	left: 0px;
+}
+#top_bar div {
+	display:inline-block;
 }
 .online::after {
 	content: '';
@@ -43,9 +76,20 @@ body {
     left: 0px;
     bottom: calc(50% - 7px/2);
 }
-#side_right {
+#side_left {
+	margin-top:30px;
 	height: 100%;
-	width: 15%;
+	width:15vw;
+	background-color: #f8f8f8;
+	position: fixed;
+	top: 0;
+	left: 0;
+	border-right: #f0f0f0 1px solid;
+}
+#side_right {
+	margin-top:30px;
+	height: 100%;
+	width:15vw;
 	background-color: #f8f8f8;
 	position: fixed;
 	top: 0;
