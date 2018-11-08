@@ -9,52 +9,20 @@ if(window.localStorage.getItem("vardas")) {
 		}
 		return arr;
 	}
-	document.getElementById("logged_in").style.display="block";
-	listas =  document.querySelector("#rasytojas_atsirado b");
-	const INSTANCE_LOCATOR = 'v1:us1:d6ef0a21-b488-4a71-a59d-65431f8409f2'
-	const TOKEN_PROVIDER_URL = 'https://us1.pusherplatform.io/services/chatkit_token_provider/v1/d6ef0a21-b488-4a71-a59d-65431f8409f2/token?instance_locator=v1:us1:d6ef0a21-b488-4a71-a59d-65431f8409f2'
-	const USER_ID = window.localStorage.getItem("vardas")
-	let rasytojai = []
-	let currentUser
-	let room
-	let online_old = []
-	const tokenProvider = new Chatkit.TokenProvider({
-	  url: TOKEN_PROVIDER_URL
-	})
-
-	chatManager = new Chatkit.ChatManager({
-	  instanceLocator: INSTANCE_LOCATOR,
-	  tokenProvider: tokenProvider,
-	  userId: USER_ID
-	})
-	chatManager.connect()
-	  .then(cUser => {
-		  
-		document.getElementById("neegzistuoja").style.display="none";
-		currentUser = cUser
-		online_old.push(cUser.name);
-		currentUser.users.filter(user => user.presence.state === 'online' && user.name !== currentUser.name).forEach(function(user) {
-			div = document.createElement("div");
-			div.classList.add("user");
-			div.innerHTML+='<span name="'+user.name+'" class="online">'+user.name+'</span>';
-			document.getElementById("side_right").appendChild(div);
-		});
-		currentUser.users.filter(user => user.presence.state != 'online' && user.name !== currentUser.name).forEach(function(user) {
-			div = document.createElement("div");
-			div.classList.add("user");
-			div.innerHTML+='<span name="'+user.name+'" class="offline">'+user.name+'</span>';
-			document.getElementById("side_right").appendChild(div);
-		});
-		const roomToSubscribeTo = currentUser.rooms[0]
-
-		if (roomToSubscribeTo) {
+	function setroom(roomToSubscribeTo) {
+		if(typeof roomToSubscribeTo == "number") {
+			roomToSubscribeTo = kambariai[roomToSubscribeTo];
+		}
 		  room = roomToSubscribeTo
-		  
+		  if(document.getElementsByClassName("active").length > 0) {
+			document.getElementsByClassName("active")[0].classList.remove("active");
+		  }
+		  document.getElementById("room_"+room.name).classList.add("active");
+		  document.getElementById("messages").innerHTML = "";
 		  currentUser.subscribeToRoom({
 			roomId: roomToSubscribeTo.id,
 			hooks: {
 				onPresenceChanged: (state, user) => {
-					console.log("lmao");
 				},
 			  onUserStartedTyping: user => {
 				rasytojai.push(user);
@@ -117,41 +85,104 @@ if(window.localStorage.getItem("vardas")) {
 					messageItem.appendChild(attachment)
 				  }
 				}
+				clearTimeout(resetas);
+				resetas=setTimeout(function() {window.scrollTo(0,document.body.scrollHeight);},500);
 			  }
 			}
 		  })
+			setInterval(function() {
+				offline = currentUser.users.filter(user => user.presence.state != 'online' && user.name !== currentUser.name);
+				online = currentUser.users.filter(user => user.presence.state === 'online' && user.name !== currentUser.name);
+				online.forEach(function(usr) {
+					if(!online_old.includes(usr.name)) {
+						document.getElementsByName(usr.name)[0].classList.add("online");
+						document.getElementsByName(usr.name)[0].classList.remove("offline");
+						online_old.push(usr.name);
+					}
+				});
+				offline.forEach(function(usr) {
+					if(online_old.includes(usr.name)) {
+						document.getElementsByName(usr.name)[0].classList.remove("online");
+						document.getElementsByName(usr.name)[0].classList.add("offline");
+						removeA(online_old,usr.name);
+					}
+				});
+			},1000);
+			console.log("room set to: " + room.name);
+	}
+	document.getElementById("logged_in").style.display="block";
+	listas =  document.querySelector("#rasytojas_atsirado b");
+	const INSTANCE_LOCATOR = 'v1:us1:d6ef0a21-b488-4a71-a59d-65431f8409f2'
+	const TOKEN_PROVIDER_URL = 'https://us1.pusherplatform.io/services/chatkit_token_provider/v1/d6ef0a21-b488-4a71-a59d-65431f8409f2/token?instance_locator=v1:us1:d6ef0a21-b488-4a71-a59d-65431f8409f2'
+	const USER_ID = window.localStorage.getItem("vardas")
+	let rasytojai = []
+	let currentUser
+	let room
+	let resetas
+	let kambariai = []
+	let online_old = []
+	const tokenProvider = new Chatkit.TokenProvider({
+	  url: TOKEN_PROVIDER_URL
+	})
+
+	chatManager = new Chatkit.ChatManager({
+	  instanceLocator: INSTANCE_LOCATOR,
+	  tokenProvider: tokenProvider,
+	  userId: USER_ID
+	})
+	chatManager.connect()
+	  .then(cUser => {
+		cUser.rooms.forEach(function(room) {
+			div = document.createElement("div");
+			div.classList.add("room");
+			div.id="room_"+room.name; 
+			div.innerHTML+='<span class="room_name">'+room.name+'</span>';
+			console.log(room);
+			div.setAttribute("onclick", "setroom("+room.id+")");
+			kambariai[room.id] = room;
+			document.getElementById("side_left").appendChild(div);
+		});
+		document.getElementById("neegzistuoja").style.display="none";
+		currentUser = cUser
+		online_old.push(cUser.name);
+		currentUser.users.filter(user => user.presence.state === 'online' && user.name !== currentUser.name).forEach(function(user) {
+			div = document.createElement("div");
+			div.classList.add("user");
+			div.innerHTML+='<span name="'+user.name+'" class="online">'+user.name+'</span>';
+			document.getElementById("side_right").appendChild(div);
+		});
+		currentUser.users.filter(user => user.presence.state != 'online' && user.name !== currentUser.name).forEach(function(user) {
+			div = document.createElement("div");
+			div.classList.add("user");
+			div.innerHTML+='<span name="'+user.name+'" class="offline">'+user.name+'</span>';
+			document.getElementById("side_right").appendChild(div);
+		});
+		currentUser.getJoinableRooms()
+		  .then(rooms => {
+			  console.log(rooms);
+
+		  })
+		  .catch(err => {
+			console.log(`Error getting joinable rooms: ${err}`)
+		})
+		const roomToSubscribeTo = currentUser.rooms[0]
+
+		if (roomToSubscribeTo) {
+			setroom(roomToSubscribeTo);
 		} else {
 		  console.log('No room to subscribe to')
 		}
+		
 		console.log('Successful connection', currentUser)
 	  })
 	  .catch(err => {
 		console.log('Error on connection: ', err)
 	  })
-	  
-	  setInterval(function() {
-		offline = currentUser.users.filter(user => user.presence.state != 'online' && user.name !== currentUser.name);
-		online = currentUser.users.filter(user => user.presence.state === 'online' && user.name !== currentUser.name);
-		online.forEach(function(usr) {
-			if(!online_old.includes(usr.name)) {
-				document.getElementsByName(usr.name)[0].classList.add("online");
-				document.getElementsByName(usr.name)[0].classList.remove("offline");
-				online_old.push(usr.name);
-			}
-		});
-		offline.forEach(function(usr) {
-			if(online_old.includes(usr.name)) {
-				document.getElementsByName(usr.name)[0].classList.remove("online");
-				document.getElementsByName(usr.name)[0].classList.add("offline");
-				removeA(online_old,usr.name);
-			}
-		});
-	  },1000);
 	document.addEventListener("DOMContentLoaded", function() {
+		
 		document.getElementById("text-input").addEventListener('keypress', ev=> {
 			currentUser.isTypingIn({ roomId: 19372995 })
 				.then(() => {
-					
 				})
 				.catch(err => {
 				console.log(`Error sending typing indicator: ${err}`)
