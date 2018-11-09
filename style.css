@@ -2,6 +2,9 @@ body {
   font-family: "Roboto", Roboto, sans-serif;
   background-color:#fafafa;
 }
+img {
+	width:100px;
+}
 .logout {
 	background-color:#f0f0f0;
 	height:100%;
